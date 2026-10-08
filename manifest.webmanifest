@@ -1,0 +1,27 @@
+{
+  "name": "SilhluetaSAT-v1.3",
+  "short_name": "SilhluetaSAT",
+  "description": "SilhluetaSAT para contagem de disparos e modalidades configuráveis. Download da imagem do alvo e Laudo Anexo II em PDF disponíveis na versão Pro.",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
