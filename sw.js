@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "silhluetasat-standard-";
-const CACHE_NAME = CACHE_PREFIX + 'student-number-notice-1';
+const CACHE_NAME = CACHE_PREFIX + 'remove-stg-1';
 const ASSETS = [
   "./sat-report.js?v=1",
   "./",

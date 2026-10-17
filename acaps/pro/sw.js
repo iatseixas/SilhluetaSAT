@@ -1,5 +1,5 @@
 const CACHE_PREFIX="acaps-humanoide-pro-";
-const CACHE_NAME=CACHE_PREFIX+'icons-safe-margin-3';
+const CACHE_NAME=CACHE_PREFIX+'remove-stg-1';
 const ASSETS=["./", "./index.html", "./apple-touch-icon.png", "./icon.png", "./icon-192.png", "./icon.svg", "./manifest.webmanifest", "./alvobicolor.jpg", "./icon-512.png", "./favicon-16.png", "./alvocolor.jpg", "./favicon.ico", "./favicon-32.png", "icon-192.png", "icon-512.png", "manifest.webmanifest", "favicon.ico", "favicon-32.png", "favicon-16.png", "apple-touch-icon.png", "../acaps-storage.js?v=1", "../acaps-template.js?v=1", "../acaps-report.js?v=1", "../sat-report.js?v=1"];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith(CACHE_PREFIX)&&key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});

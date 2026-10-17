@@ -1110,7 +1110,20 @@
     const activeTargetPointers = new Map();
     const activeShotGesturePointers = new Set();
 
-    targetImage.onload = draw;
+    // Keep the target geometry intact; clear only the STG branding in the black margin.
+    const unbrandedTarget = document.createElement('canvas');
+    targetImage.onload = function() {
+      unbrandedTarget.width = targetImage.naturalWidth;
+      unbrandedTarget.height = targetImage.naturalHeight;
+      const imageCtx = unbrandedTarget.getContext('2d');
+      imageCtx.drawImage(targetImage, 0, 0);
+      imageCtx.fillStyle = '#000000';
+      imageCtx.fillRect(
+        unbrandedTarget.width * 0.73, 0,
+        unbrandedTarget.width * 0.27, unbrandedTarget.height * 0.14
+      );
+      draw();
+    };
     targetImage.onerror = function() { showToast('Imagem nao encontrada'); draw(); };
     targetImage.src = TARGET_IMAGES[currentTargetKey].src;
 
@@ -1185,7 +1198,7 @@
       ctx.fillRect(0, 0, BASE_WIDTH, BASE_HEIGHT);
       if (!(targetImage.complete && targetImage.naturalWidth)) return;
       const rect = targetDrawRect();
-      ctx.drawImage(targetImage, rect.x, rect.y, rect.width, rect.height);
+      ctx.drawImage(unbrandedTarget, rect.x, rect.y, rect.width, rect.height);
     }
 
     function draw() {
@@ -1859,7 +1872,7 @@
       reportCtx.fillRect(x, y, width, height);
       if (targetImage.complete && targetImage.naturalWidth) {
         reportCtx.drawImage(
-          targetImage,
+          unbrandedTarget,
           x + TARGET_SIDE_BORDER * scaleX,
           y + TARGET_VERTICAL_BORDER * scaleY,
           TARGET_WIDTH * scaleX,
