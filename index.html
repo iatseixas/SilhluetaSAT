@@ -793,6 +793,7 @@
 .training-config .distance-input:focus-within{border-color:var(--green)}
 .training-config .distance-input[hidden]{display:none}
 </style>
+<script src="./sat-report.js?v=1"></script>
 </head>
 <body>
   <main class="app" aria-label="SilhluetaSAT-v1.3">
@@ -854,11 +855,11 @@
         <div class="result-status" id="resultStatus">APTO</div>
       </div>
       <div class="result-calculation" id="resultCalculation" hidden></div>
-      <div class="save-fields report-fields" id="saveFields">
+      <div class="save-fields report-fields" id="saveFields"><p style="grid-column:1/-1;margin:4px 0;font-size:13px;line-height:1.4">Somente o número do laudo é obrigatório. Os demais dados podem ser preenchidos depois no DOCX.</p>
         <div class="report-title">DADOS DO AVALIADO</div>
         <div class="student-field span-3 wide-mobile"><label for="studentName">Nome do avaliado</label><input id="studentName" type="text" autocomplete="name" placeholder="Nome completo"></div>
         <div class="student-field span-2"><label for="studentCpf">CPF</label><input id="studentCpf" type="text" inputmode="numeric" maxlength="14" placeholder="XXX-XXX-XXX-XX"></div>
-        <div class="student-field span-1"><label for="studentNumber">Nº Laudo</label><input id="studentNumber" type="text" inputmode="numeric" maxlength="4" placeholder="0000"></div>
+        <div class="student-field span-1"><label for="studentNumber">Nº Laudo</label><input id="studentNumber" type="text" inputmode="numeric" maxlength="4" placeholder="0000" aria-required="true"></div>
         <div class="student-field span-3 wide-mobile"><label for="addrStreet">Rua</label><input id="addrStreet" type="text" placeholder="Rua"></div>
         <div class="student-field span-1"><label for="addrNumber">Nº</label><input id="addrNumber" type="text" placeholder="Nº"></div>
         <div class="student-field span-2"><label for="addrDistrict">Bairro</label><input id="addrDistrict" type="text" placeholder="Bairro"></div>
@@ -906,8 +907,8 @@
             <div class="result-actions">
         <button class="close-result" id="closeResultBtn" type="button">Voltar</button>
         <button class="new-result" id="newResultBtn" type="button">Nova serie</button>
-        <button class="save-result" id="saveResultBtn" type="button">Baixar Laudo Anexo II</button>
-        <button class="image-result" id="saveImageBtn" type="button">Baixar imagem do alvo</button>
+        <button class="save-result" id="saveResultBtn" type="button">Baixar laudo DOCX</button>
+        <button class="image-result" id="saveImageBtn" type="button">Foto do alvo</button>
       </div>
     </div>
   </section>
@@ -2118,21 +2119,19 @@
       return c;
     }
 
+    const reportPhoto = SATReport.photoControl({button:saveImageBtn,notify:showToast,key:()=>testAt||''});
+    function requireReportNumber(){
+      const value=reportValue(studentNumber);
+      if(/^\d{1,4}$/.test(value))return value;
+      showToast('Informe o número do laudo para gerar o DOCX.');
+      studentNumber.scrollIntoView({block:'center',behavior:'smooth'});studentNumber.focus();return null;
+    }
     function saveAnexoII() {
-      const now = new Date();
-      const dd = String(now.getDate()).padStart(2, '0'), mm = String(now.getMonth() + 1).padStart(2, '0'), yyyy = now.getFullYear();
-      const nome = safeDocumentLabel(studentName.value, 'AVALIADO').toUpperCase();
-      const laudo = safeDocumentLabel(studentNumber.value, '____');
-      const filename = nome + ' Nº ' + laudo + '-' + String(yyyy).slice(-2) + ' (' + dd + '.' + mm + '.' + yyyy + ') LAUDO ANEXO II.pdf';
-      try {
-        const reportCanvas = createAnexoIICanvas();
-        const pdfBytes = createSinglePagePdf(reportCanvas);
-        const savedInApp = savePdfFile(pdfBytes, filename);
-        showToast(nativeSaveMessage('PDF', savedInApp));
-      } catch (error) {
-        console.error(error);
-        showToast('Não foi possível gerar o Laudo Anexo II');
-      }
+      const number=requireReportNumber();if(!number)return;
+      if(reportPhoto.isBusy())return showToast('Aguarde o processamento da foto.');
+      const date=reportTestDate(),year=date.getFullYear(),name=reportUpper(studentName),silhouette=currentTotal(),theory=reportValue(theoryScore),multicolor=reportValue(fourColorScore),training=!!(reportTrainingMode&&reportTrainingMode.checked);
+      const approved=training?silhouette>=60:(theory!==''&&multicolor!==''?silhouette>=60&&reportNumber(theoryScore)>=60&&reportNumber(fourColorScore)>=72:null);
+      try{const bytes=SATReport.build({kind:'silhouette',number:number+'/'+String(year).slice(-2),name:name,cpf:reportValue(studentCpf),address:reportAddressText(),gun:{type:reportUpper(gunType),brand:reportUpper(gunBrand),caliber:reportUpper(gunCaliber),serial:reportUpper(gunSerial),registry:reportUpper(gunRegistry),system:reportValue(gunSystem)},place:reportDeclarationPlace(),date:reportSystemDateBR(),rangeName:reportUpper(rangeName),rangeAddress:rangeAddressText(),foundation:{purpose:reportValue(purpose),category:reportValue(category)},scores:{training:training,theory:theory,multicolor:multicolor},points:silhouette,percent:silhouette,approved:approved,evaluator:{name:reportUpper(evaluatorName),cpf:reportValue(evaluatorCpf),credential:reportUpper(evaluatorCredential),validity:formatCredentialValidityValue()},emission:reportEmissionLine(),photo:reportPhoto.get()});SATReport.save(bytes,safeDocumentLabel(name,'AVALIADO')+' Nº '+number+'-'+String(year).slice(-2)+' LAUDO ANEXO II.docx',showToast)}catch(error){console.error(error);showToast('Não foi possível gerar o laudo DOCX.')}
     }
 
     function safeStudentFilePart(value, fallback) {
@@ -2157,6 +2156,7 @@
     }
 
         function resetSeries() {
+      reportPhoto.clear();
       shots.length = 0;
       testAt = null;
       hideFinalResult();
@@ -2232,8 +2232,8 @@ if (studentNumber) studentNumber.addEventListener('input', function() { studentN
     shotCountSelect.addEventListener('change', applyTrainingConfiguration);
     closeResultBtn.addEventListener('click', hideFinalResult);
     newResultBtn.addEventListener('click', resetSeries);
-    saveResultBtn.addEventListener('click', showProNotice);
-    saveImageBtn.addEventListener('click', showProNotice);
+    saveResultBtn.addEventListener('click', saveAnexoII);
+
     window.addEventListener('resize', function() {
       zoomExpanded = targetZoom > 1.01 && mobileZoomLayout();
       updateZoomUi();
