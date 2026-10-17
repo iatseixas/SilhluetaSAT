@@ -782,16 +782,21 @@
 .footer{margin-top:0!important;padding-top:0!important}
 .footer .app-info-wrap{margin:0 auto!important}
 @media(max-width:520px){.app{gap:4px!important}}
+
+/* Cabeçalho compacto: um único botão alterna os dois modelos de alvo. */
+.metrics>.metric{min-height:44px;padding:4px 6px}
+.metrics .metric span{margin-top:3px}
+.target-switch{grid-template-rows:1fr;gap:0}
+.target-switch .target-option{height:36px;min-height:36px;padding:4px 3px;white-space:nowrap}
+.training-config{padding:6px 8px;gap:4px 8px}
+.config-field input,.config-field select,.fixed-distance{height:34px;min-height:34px;padding:4px 6px}
 </style>
 </head>
 <body>
   <main class="app" aria-label="SilhluetaSAT-ProV1.3">
     <section class="metrics" aria-label="Resumo">
       <div class="metric target-metric">
-        <div class="target-switch" aria-label="Escolha do alvo">
-          <button class="target-option" type="button" data-target="alvo1" aria-label="Alvo 1, humanoide preto e branco" title="Humanoide preto e branco">Alvo 1</button>
-          <button class="target-option" type="button" data-target="alvo2" aria-label="Alvo 2, humanoide colorido" title="Humanoide colorido">Alvo 2</button>
-        </div>
+        <div class="target-switch" aria-label="Escolha do alvo"><button class="target-option active" id="targetToggle" type="button" data-target="alvo1" aria-label="Alvo monocromático. Toque para mudar para colorido." title="Alternar entre alvo monocromático e colorido">Alvo 1 ↻</button></div>
       </div>
       <div class="metric"><div><strong id="distanceLabel">5m</strong><span>DIST</span></div></div>
       <div class="metric"><div><strong id="shotsLabel">0/20</strong><span>TIROS</span></div></div>
@@ -1091,9 +1096,18 @@
 
     function updateTargetButtons() {
       targetButtons.forEach(function(btn) {
-        btn.classList.toggle('active', btn.dataset.target === currentTargetKey);
-        btn.setAttribute('aria-pressed', btn.dataset.target === currentTargetKey ? 'true' : 'false');
+        const colored = currentTargetKey === 'alvo2';
+        btn.dataset.target = currentTargetKey;
+        btn.classList.add('active');
+        btn.textContent = (colored ? 'Alvo 2' : 'Alvo 1') + ' ↻';
+        btn.setAttribute('aria-pressed', colored ? 'true' : 'false');
+        btn.setAttribute('aria-label', (colored ? 'Alvo colorido. Toque para mudar para monocromático.' : 'Alvo monocromático. Toque para mudar para colorido.'));
+        btn.title = colored ? 'Colorido — toque para monocromático' : 'Monocromático — toque para colorido';
       });
+    }
+
+    function toggleTarget() {
+      setTarget(currentTargetKey === 'alvo1' ? 'alvo2' : 'alvo1');
     }
 
     function setTarget(key) {
@@ -2178,7 +2192,7 @@ if (studentNumber) studentNumber.addEventListener('input', function() { studentN
     targetButtons.forEach(function(btn) {
       btn.addEventListener('click', function(event) {
         event.stopPropagation();
-        setTarget(btn.dataset.target);
+        toggleTarget();
       });
     });
     updateTargetButtons();
