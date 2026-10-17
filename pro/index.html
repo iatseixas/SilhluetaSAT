@@ -799,6 +799,11 @@
 .training-config .distance-input b{font:900 1rem/1 system-ui,sans-serif;color:#fff;text-transform:none}
 .training-config .distance-input:focus-within{border-color:var(--green)}
 .training-config .distance-input[hidden]{display:none}
+
+/* Número e unidade centralizados como um único conjunto. */
+.training-config .distance-input{display:flex;justify-content:center;align-items:center;gap:5px}
+.training-config .distance-input input{flex:0 0 auto;width:2ch;text-align:center;appearance:textfield;-moz-appearance:textfield}
+.training-config .distance-input input::-webkit-inner-spin-button,.training-config .distance-input input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 </style>
 <script src="../sat-report.js?v=1"></script>
 </head>
@@ -1407,12 +1412,16 @@
       return trainingMode === '10' ? 2 : 1;
     }
 
+    function centerDistanceValue(){
+      const measure=document.createElement('canvas').getContext('2d');
+      if(measure){measure.font=getComputedStyle(distanceInput).font;distanceInput.style.width=(Math.ceil(measure.measureText(distanceInput.value||'0').width)+2)+'px'}
+    }
     function applyTrainingConfiguration() {
       if (shots.length) return;
       configuredDistance = normalizeDistance(distanceInput.value);
       trainingMode = ['20', '10', 'anp'].includes(shotCountSelect.value) ? shotCountSelect.value : '20';
       configuredShotCount = trainingMode === '10' ? 10 : 20;
-      distanceInput.value = String(configuredDistance);
+      distanceInput.value = String(configuredDistance);centerDistanceValue();
       shotCountSelect.value = trainingMode;
       localStorage.setItem('humanoide-treina-distance', String(configuredDistance));
       localStorage.setItem('humanoide-treina-shot-count', String(configuredShotCount));
@@ -2236,6 +2245,8 @@ if (studentNumber) studentNumber.addEventListener('input', function() { studentN
     });
     clearBtn.addEventListener('click', resetSeries);
     distanceInput.addEventListener('change', applyTrainingConfiguration);
+    distanceInput.addEventListener('input', centerDistanceValue);
+    window.addEventListener('resize', centerDistanceValue);
     shotCountSelect.addEventListener('change', applyTrainingConfiguration);
     closeResultBtn.addEventListener('click', hideFinalResult);
     newResultBtn.addEventListener('click', resetSeries);
@@ -2254,7 +2265,7 @@ if (studentNumber) studentNumber.addEventListener('input', function() { studentN
     }
 
     configuredDistance = normalizeDistance(configuredDistance);
-    distanceInput.value = String(configuredDistance);
+    distanceInput.value = String(configuredDistance);centerDistanceValue();
     shotCountSelect.value = trainingMode;
     updateDisplay();
     draw();
