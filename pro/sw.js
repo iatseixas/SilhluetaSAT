@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "silhluetasat-pro-";
-const CACHE_NAME = CACHE_PREFIX + "v1.3-r14";
+const CACHE_NAME = CACHE_PREFIX + "v1.3-r15";
 const ASSETS = [
   "../sat-report.js?v=1",
   "./",
