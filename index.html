@@ -774,7 +774,9 @@
 .app-developer-info summary:focus-visible{outline:2px solid #a5ef2d;outline-offset:4px;border-radius:4px}
 .app-developer-info p{margin:10px 0 0;line-height:1.6;overflow-wrap:anywhere}
 
-.developer-presentation a{color:#a5ef2d;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}.developer-app-links{margin:12px 0;padding-left:22px}.developer-app-links li{margin:8px 0;line-height:1.5}.developer-presentation a:focus-visible{outline:2px solid #a5ef2d;outline-offset:3px}
+.developer-presentation a{color:#a5ef2d;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}.developer-app-links{margin:12px 0;padding-left:22px}.developer-app-links li{margin:8px 0;line-height:1.5}.developer-presentation a:focus{outline:none;box-shadow:none}
+.developer-presentation a:focus-visible{text-decoration-thickness:3px;text-underline-offset:4px}
+@media(hover:none) and (pointer:coarse){.developer-presentation a:focus-visible{text-decoration-thickness:auto;text-underline-offset:auto}}
 
 /* Cabeçalho compacto: um único botão alterna os dois modelos de alvo. */
 .metrics>.metric{min-height:44px;padding:4px 6px}
