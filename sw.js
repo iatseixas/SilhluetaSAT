@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "silhluetasat-standard-";
-const CACHE_NAME = CACHE_PREFIX + "v1.3-r8";
+const CACHE_NAME = CACHE_PREFIX + "v1.3-r9";
 const ASSETS = [
   "./",
   "./index.html",
